@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
 using Mongotest.Data;
 using Mongotest.Models.V1;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Mongotest.Controllers.V1
 {
@@ -48,7 +45,6 @@ namespace Mongotest.Controllers.V1
                 return BadRequest(ex);
             }
         }
-
         // POST api/<PersonController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] PersonModel person)
@@ -65,7 +61,6 @@ namespace Mongotest.Controllers.V1
                 return BadRequest(ex);
             }
         }
-
         // PUT api/<PersonController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(string id, [FromBody] PersonModel person)
@@ -82,7 +77,6 @@ namespace Mongotest.Controllers.V1
                 return BadRequest(ex);
             }
         }
-
         // DELETE api/<PersonController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)

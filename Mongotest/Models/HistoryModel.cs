@@ -4,6 +4,6 @@
     {
         public string? Notes { get; set; }
         public string ModelId { get; set; } = string.Empty;
-        public T? Model { get; set; }
+        public List<T>? Models { get; set; } = new List<T>();
     }
 }

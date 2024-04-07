@@ -33,7 +33,8 @@ namespace Mongotest.Data
         // add the remaining crud operations
         public async Task<T> CreateAsync<T>(T model, string collectionName) where T : BaseModel
         {
-            var type = typeof(T);
+            model.DateCreated = DateTime.UtcNow;
+            model.DateLastUpdated = DateTime.UtcNow;
             var collection = ConnectDb<T>(collectionName);
             await collection.InsertOneAsync(model);
             try
@@ -51,6 +52,7 @@ namespace Mongotest.Data
         public async Task<T> UpsertAsync<T>(string id, T model, string collectionName) where T : BaseModel
         {
             var collection = ConnectDb<T>(collectionName);
+            model.DateLastUpdated = DateTime.UtcNow;
             await collection.ReplaceOneAsync(x => x.Id == id, model, new ReplaceOptions { IsUpsert = true });
 
             await AddHistory(id, model, "Upserted", collectionName);
@@ -111,18 +113,40 @@ namespace Mongotest.Data
         }
         private async Task AddHistory<T>(string id, T model, string notes, string collectionName) where T : BaseModel
         {
-            var history = new HistoryModel<T>
-            {
-                Id = id,
-                ModelId = id,
-                Model = model,
-                Notes = notes,
-                DateLastUpdated = DateTime.Now
-            };
+
             var collectionString = $"HistoryModel<{collectionName}>";
             var collection = ConnectDb<HistoryModel<T>>(collectionString);
 
-            await collection.ReplaceOneAsync(f => f.Model != null && f.Model.Id == id, history, new ReplaceOptions { IsUpsert = true });
+            // First check if there is a history for the model
+            var ls = await collection.FindAsync(f => f.ModelId != null && f.ModelId == id);
+            if (ls.Any())
+            {
+                var historyModel = await ls.FirstOrDefaultAsync();
+                historyModel.DateLastUpdated = DateTime.UtcNow;
+                if (historyModel.Models is null)
+                {
+                    historyModel.Models = new List<T>();
+                }
+                historyModel.Models.Add(model);
+                await collection.ReplaceOneAsync(f => f.ModelId != null && f.ModelId == id, historyModel, new ReplaceOptions { IsUpsert = true });
+            }
+            else
+            {
+                var history = new HistoryModel<T>
+                {
+                    Id = id,
+                    ModelId = id,
+                    Notes = notes,
+                    DateLastUpdated = DateTime.UtcNow,
+                    DateCreated = DateTime.UtcNow
+                };
+                if (history.Models is null)
+                {
+                    history.Models = new List<T>();
+                }
+                history.Models.Add(model);
+                await collection.InsertOneAsync(history);
+            }           
         }
     }
 }

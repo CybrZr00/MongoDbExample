@@ -12,10 +12,12 @@ namespace Mongotest.Controllers.V1
     public class PersonController : ControllerBase
     {
         private readonly IApplicationDA _db;
+        private readonly ILogger<PersonController> _logger;
 
-        public PersonController(IApplicationDA db)
+        public PersonController(IApplicationDA db, ILogger<PersonController> logger)
         {
             _db = db; 
+            _logger = logger;
         }
         // GET: api/<PersonController>
         [HttpGet]
@@ -27,7 +29,8 @@ namespace Mongotest.Controllers.V1
             }
             catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error getting all people");
+                return BadRequest(ex);
             }
         }
 
@@ -41,7 +44,7 @@ namespace Mongotest.Controllers.V1
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Error getting one PeopleModel");
                 return BadRequest(ex);
             }
         }
@@ -58,6 +61,7 @@ namespace Mongotest.Controllers.V1
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error creating PersonModel record");
                 return BadRequest(ex);
             }
         }
@@ -73,6 +77,8 @@ namespace Mongotest.Controllers.V1
             }
             catch (Exception ex)
             {
+
+                _logger.LogError(ex, "Error updating Person");
                 return BadRequest(ex);
             }
         }
@@ -88,6 +94,8 @@ namespace Mongotest.Controllers.V1
             }
             catch (Exception ex)
             {
+
+                _logger.LogError(ex, "Error deleting Person");
                 return BadRequest(ex);
             }
         }

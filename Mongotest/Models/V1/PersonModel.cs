@@ -1,10 +1,10 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-
-namespace Mongotest.Models.V1
+﻿namespace Mongotest.Models.V1
 {
     public class PersonModel : BaseModel
     {
-        public string Name { get; set; }
-        public string Age { get; set; }
+        public string Name { get; set; } = "Default Name";
+        public int Age { get; set; } = 0;
+
+        public bool IsHuman { get; set; }
     }
 }

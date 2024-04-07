@@ -1,4 +1,4 @@
-﻿namespace Mongotest.Models
+﻿namespace Mongotest.Models.V1
 {
     public class HistoryModel<T> : BaseModel
     {

@@ -1,4 +1,4 @@
-﻿using Mongotest.Models;
+﻿using Mongotest.Models.V1;
 
 namespace Mongotest.Data
 {

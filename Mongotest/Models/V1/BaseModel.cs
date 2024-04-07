@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace Mongotest.Models
+namespace Mongotest.Models.V1
 {
     public class BaseModel
     {

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 using Mongotest.Data;
 
 using Serilog;
@@ -19,7 +21,8 @@ var log = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .CreateLogger();
     
-
+builder.Services.AddDbContext<ApplicationEFContext>(options =>
+    options.UseMongoDb(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Register the logger as a singleton
 builder.Services.AddSingleton<Serilog.ILogger>(log);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

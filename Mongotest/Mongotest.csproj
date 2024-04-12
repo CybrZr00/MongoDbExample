@@ -18,6 +18,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MongoDB.Driver" Version="2.24.0" />
+    <PackageReference Include="OpenIddict.Abstractions" Version="5.4.0" />
+    <PackageReference Include="OpenIddict.Validation" Version="5.4.0" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="5.4.0" />
+    <PackageReference Include="OpenIddict.Validation.SystemNetHttp" Version="5.4.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />

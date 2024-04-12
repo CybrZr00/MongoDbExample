@@ -1,11 +1,15 @@
 ﻿using Blueshift.EntityFrameworkCore.MongoDB;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mongotest.Data;
 using Mongotest.Models.V1;
 
+using OpenIddict.Validation.AspNetCore;
+
 namespace Mongotest.Controllers.V1
 {
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Route("api/V1/[controller]")]
     [ApiController]
     public class PersonController : ControllerBase

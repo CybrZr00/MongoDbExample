@@ -1,4 +1,8 @@
-﻿namespace Mongotest.Models.V1
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Mongotest.Models.V1
 {
     public class HistoryModel<T> : BaseModel
     {

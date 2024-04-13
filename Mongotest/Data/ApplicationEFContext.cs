@@ -12,7 +12,7 @@ namespace Mongotest.Data
         public DbSet<HistoryModel<BaseModel>> Histories { get; set; }
         public ApplicationEFContext(DbContextOptions<ApplicationEFContext> options) : base(options)
         {
-               
+            Database.EnsureCreatedAsync();
         }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

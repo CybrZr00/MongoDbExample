@@ -23,7 +23,7 @@ namespace Mongotest.Data
             var ls = await collection.FindAsync(_ => true);
             return await ls.ToListAsync();
         }
-        public async Task<T> GetOneAsync<T>(string id, string collectionName) where T : BaseModel
+        public async Task<T> GetOneAsync<T>(Guid id, string collectionName) where T : BaseModel
         {
             var collection = ConnectDb<T>(collectionName);
             var ls = await collection.FindAsync(x => x.Id == id);
@@ -48,7 +48,7 @@ namespace Mongotest.Data
 
             return model;
         }
-        public async Task<T> UpsertAsync<T>(string id, T model, string collectionName) where T : BaseModel
+        public async Task<T> UpsertAsync<T>(Guid id, T model, string collectionName) where T : BaseModel
         {
             var collection = ConnectDb<T>(collectionName);
             model.DateLastUpdated = DateTime.UtcNow;
@@ -58,7 +58,7 @@ namespace Mongotest.Data
 
             return model;
         }
-        public async Task DeleteAsync<T>(string id, string collectionName) where T : BaseModel
+        public async Task DeleteAsync<T>(Guid id, string collectionName) where T : BaseModel
         {
             var collection = ConnectDb<T>(collectionName);
             await collection.DeleteOneAsync(x => x.Id == id);
@@ -110,7 +110,7 @@ namespace Mongotest.Data
             var ls = await collection.FindAsync(_ => true);
             return await ls.AnyAsync();
         }
-        private async Task AddHistory<T>(string id, T model, string notes, string collectionName) where T : BaseModel
+        private async Task AddHistory<T>(Guid id, T model, string notes, string collectionName) where T : BaseModel
         {
 
             var collectionString = $"HistoryModel<{collectionName}>";

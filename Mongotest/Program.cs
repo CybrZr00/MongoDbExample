@@ -51,8 +51,8 @@ var log = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .CreateLogger();
     
-builder.Services.AddDbContext<ApplicationEFContext>(options =>
-    options.UseMongoDb(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<ApplicationEFContext>(options =>
+//    options.UseMongoDB(builder.Configuration.GetConnectionString("DefaultConnection"), "mongotest_v1_ef"));
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new[] { "en-GB" };

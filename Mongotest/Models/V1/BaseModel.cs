@@ -7,9 +7,9 @@ namespace Mongotest.Models.V1
     public class BaseModel
     {
         [Key]
-        [BsonId]
-        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)] // This is used to convert the string ID into an ObjectId
-        public string Id { get; set; } = "";
+        //[BsonId]
+        //[BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)] // This is used to convert the string ID into an ObjectId
+        public Guid Id { get; set; }
         [DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:U}", ApplyFormatInEditMode = true)]
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
@@ -17,4 +17,14 @@ namespace Mongotest.Models.V1
         [DisplayFormat(DataFormatString = "{0:U}", ApplyFormatInEditMode = true)]
         public DateTime DateLastUpdated { get; set; } = DateTime.UtcNow;
     }
+    //public class BaseModelEf
+    //{
+    //    public Guid Id { get; set; }
+    //    [DataType(DataType.DateTime)]
+    //    [DisplayFormat(DataFormatString = "{0:U}", ApplyFormatInEditMode = true)]
+    //    public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+    //    [DataType(DataType.DateTime)]
+    //    [DisplayFormat(DataFormatString = "{0:U}", ApplyFormatInEditMode = true)]
+    //    public DateTime DateLastUpdated { get; set; } = DateTime.UtcNow;
+    //}
 }

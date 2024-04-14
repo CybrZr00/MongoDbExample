@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
-
 using Mongotest.Data;
 using Mongotest.Models.V1;
-
 using System.Text.Json;
 
 namespace Mongotest.Controllers.V1
@@ -57,7 +52,7 @@ namespace Mongotest.Controllers.V1
                 {
                     return Ok(await _context.People.FindAsync(id));
                 }
-                return Ok(await _db.GetOneAsync<PersonModel>(id, nameof(PersonModel)));
+                return Ok(await _db.GetOneAsync<PersonModel>(id.ToString(), nameof(PersonModel)));
             }
             catch (Exception ex)
             {
@@ -76,7 +71,7 @@ namespace Mongotest.Controllers.V1
                 {
                     pef = new PersonModel
                     {
-                        Id = Guid.NewGuid(),
+                        Id = Guid.NewGuid().ToString(),
                         Name = person.Name,
                         Age = person.Age,
                         IsHuman = person.IsHuman
@@ -109,7 +104,7 @@ namespace Mongotest.Controllers.V1
             PersonModel? personToBeUpdated = default;
             try
             {
-                if(id != person.Id)
+                if(id.ToString() != person.Id)
                 {
                     return BadRequest("Ambiguous identity");
                 }
@@ -127,7 +122,7 @@ namespace Mongotest.Controllers.V1
                     await _context.SaveChangesAsync();
                     return Accepted();
                 }
-                await _db.UpsertAsync(id, person, nameof(PersonModel));
+                await _db.UpsertAsync(id.ToString(), person, nameof(PersonModel));
                 return Accepted();
             }
             catch (Exception ex)
@@ -138,7 +133,7 @@ namespace Mongotest.Controllers.V1
             {
                 if (personToBeUpdated is not null)
                 {
-                    AddHistoryEF(id, personToBeUpdated, HistoryAction.Updated);
+                    AddHistoryEF(id.ToString(), personToBeUpdated, HistoryAction.Updated);
                 }
                 _logger.LogInformation("Person updated");
             }
@@ -165,7 +160,7 @@ namespace Mongotest.Controllers.V1
                     await _context.SaveChangesAsync();
                     return NoContent();
                 }
-                await _db.DeleteAsync<PersonModel>(id, nameof(PersonModel));
+                await _db.DeleteAsync<PersonModel>(id.ToString(), nameof(PersonModel));
                 return NoContent();
             }
             catch (Exception ex)
@@ -177,22 +172,22 @@ namespace Mongotest.Controllers.V1
             {
                 if (personToBeDeleted is not null)
                 {
-                    AddHistoryEF(id, personToBeDeleted, HistoryAction.Deleted);
+                    AddHistoryEF(id.ToString(), personToBeDeleted, HistoryAction.Deleted);
                 }
                 _logger.LogInformation("Person deleted");
             }
         }
-        private async void AddHistoryEF(Guid id, PersonModel model, HistoryAction action = HistoryAction.Created)
+        private async void AddHistoryEF(string id, PersonModel model, HistoryAction action = HistoryAction.Created)
         {
             // First check if there is a history for the model
-            var historyModel = _context.Histories.SingleOrDefault(x => x.ModelId == model.Id);
+            var historyModel = _context.Histories.SingleOrDefault(x => x.ModelId.ToString() == model.Id);
             if (historyModel is not null)
             {
                 historyModel.DateLastUpdated = DateTime.UtcNow;
 
                 var json = JsonSerializer.Serialize(model);
                 var list = historyModel.HistoryEntries.ToList();
-                var item = CreateHistoryItem(model.GetType().Name, json, historyModel.Id, action);          
+                var item = CreateHistoryItem(model.GetType().Name, json, Guid.Parse(historyModel.Id), action);          
                 _context.HistoryItems.Add(item);
                 await _context.SaveChangesAsync();
             }
@@ -200,8 +195,8 @@ namespace Mongotest.Controllers.V1
             {
                 var history = new HistoryModelEF
                 {
-                    Id = Guid.NewGuid(),
-                    ModelId = id,
+                    Id = Guid.NewGuid().ToString(),
+                    ModelId = Guid.Parse(id),
                     Notes = "",
                     DateLastUpdated = DateTime.UtcNow,
                     DateCreated = DateTime.UtcNow
@@ -211,7 +206,7 @@ namespace Mongotest.Controllers.V1
                     history.HistoryEntries = new();
                 }
                 var json = JsonSerializer.Serialize(model);
-                var item = CreateHistoryItem(model.GetType().Name, json, history.Id, action);
+                var item = CreateHistoryItem(model.GetType().Name, json, Guid.Parse(history.Id), action);
                 _context.Histories.Add(history);
                 _context.HistoryItems.Add(item);
                 await _context.SaveChangesAsync();               

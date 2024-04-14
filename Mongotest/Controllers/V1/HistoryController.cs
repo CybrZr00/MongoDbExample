@@ -36,7 +36,7 @@ namespace Mongotest.Controllers.V1
                 var histories = await _context.Histories.ToArrayAsync();
                 foreach (var history in histories)
                 {
-                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId == history.Id).ToListAsync();
+                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId.ToString() == history.Id).ToListAsync();
                 }
                 return Ok(histories);
             }else
@@ -59,7 +59,7 @@ namespace Mongotest.Controllers.V1
                     {
                         return NotFound();
                     }
-                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId == history.Id).ToListAsync();
+                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId.ToString() == history.Id).ToListAsync();
                     return Ok(history);
                 }
                 else

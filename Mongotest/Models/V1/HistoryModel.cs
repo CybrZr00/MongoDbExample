@@ -9,7 +9,7 @@ namespace Mongotest.Models.V1
     public class HistoryModel<T> : BaseModel
     {
         public string? Notes { get; set; }
-        public Guid ModelId { get; set; }
+        public string ModelId { get; set; }
         public List<T>? Models { get; set; } = new List<T>();
     }
 

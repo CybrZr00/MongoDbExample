@@ -97,7 +97,7 @@ namespace Mongotest.Controllers.V1
             {
                 if (pef is not null)
                 {
-                    AddHistory(pef.Id, pef, HistoryAction.Created);
+                    AddHistoryEF(pef.Id, pef, HistoryAction.Created);
                 }
                 _logger.LogInformation("Person created");
             }
@@ -132,14 +132,13 @@ namespace Mongotest.Controllers.V1
             }
             catch (Exception ex)
             {
-
                 _logger.LogError(ex, "Error updating Person");
                 return BadRequest(ex.Message);
             }finally
             {
                 if (personToBeUpdated is not null)
                 {
-                    AddHistory(id, personToBeUpdated, HistoryAction.Updated);
+                    AddHistoryEF(id, personToBeUpdated, HistoryAction.Updated);
                 }
                 _logger.LogInformation("Person updated");
             }
@@ -178,12 +177,12 @@ namespace Mongotest.Controllers.V1
             {
                 if (personToBeDeleted is not null)
                 {
-                    AddHistory(id, personToBeDeleted, HistoryAction.Deleted);
+                    AddHistoryEF(id, personToBeDeleted, HistoryAction.Deleted);
                 }
                 _logger.LogInformation("Person deleted");
             }
         }
-        private async void AddHistory(Guid id, PersonModel model, HistoryAction action = HistoryAction.Created)
+        private async void AddHistoryEF(Guid id, PersonModel model, HistoryAction action = HistoryAction.Created)
         {
             // First check if there is a history for the model
             var historyModel = _context.Histories.SingleOrDefault(x => x.ModelId == model.Id);

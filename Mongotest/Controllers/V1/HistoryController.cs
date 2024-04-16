@@ -64,7 +64,7 @@ namespace Mongotest.Controllers.V1
                 }
                 else
                 {
-                    var history = await _db.GetOneAsync<HistoryModel<PersonModel>>(id, "HistoryModel<PersonModel>");
+                    var history = await _db.GetOneAsync<HistoryModel<PersonModel>>(id.ToString(), "HistoryModel<PersonModel>");
                     return Ok(history);
                 }
             }

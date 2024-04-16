@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongotest", "Mongotest\Mongotest.csproj", "{4B730CAF-B672-4460-A667-1E3D0C91ED8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mongotest", "Mongotest\Mongotest.csproj", "{4B730CAF-B672-4460-A667-1E3D0C91ED8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "AuthServer\AuthServer.csproj", "{F70AA6B5-4E21-485C-843C-7F6082B73DB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{4B730CAF-B672-4460-A667-1E3D0C91ED8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B730CAF-B672-4460-A667-1E3D0C91ED8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B730CAF-B672-4460-A667-1E3D0C91ED8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F70AA6B5-4E21-485C-843C-7F6082B73DB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F70AA6B5-4E21-485C-843C-7F6082B73DB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F70AA6B5-4E21-485C-843C-7F6082B73DB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F70AA6B5-4E21-485C-843C-7F6082B73DB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

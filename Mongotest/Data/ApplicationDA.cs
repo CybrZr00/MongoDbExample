@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using Mongotest.Models.V1;
+
+using Shared.Models;
 
 namespace Mongotest.Data
 {

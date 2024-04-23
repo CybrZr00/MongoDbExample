@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
-namespace Mongotest.Models.V1
+namespace Shared.Models
 {
     public class HistoryModel<T> : BaseModel
     {
@@ -13,7 +13,7 @@ namespace Mongotest.Models.V1
         public List<T>? Models { get; set; } = new List<T>();
     }
 
-    public class HistoryModelEF : BaseModel
+    public class HistoryModelEF : BaseModelEf
     {
         public string? Notes { get; set; }
         public Guid ModelId { get; set; }

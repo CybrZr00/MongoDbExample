@@ -1,4 +1,4 @@
-﻿using Mongotest.Models.V1;
+﻿using Shared.Models;
 
 namespace Mongotest.Data
 {

@@ -1,0 +1,159 @@
+﻿@page "/people"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Net.Http.Headers
+@inject IToastService ToastService
+@attribute [Authorize]
+
+@inject IDialogService DialogService
+@inject HttpClient Http
+@inject IAccessTokenProvider _tokenProvider;
+
+<div class="position-relative vh-100">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-sm-12">
+            <h3>People</h3>
+            <FluentDataGrid Items="@people">
+                <PropertyColumn Property="@(p => p.Name)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.Age)" Sortable="true" />              
+                <PropertyColumn Property="@(p => p.DateCreated)" Format="yyyy-MM-dd" Sortable="true" />
+                <PropertyColumn Property="@(p => p.DateLastUpdated)" Format="yyyy-MM-dd" Sortable="true" />
+                <TemplateColumn Title="Actions" Align="@Align.End">
+                    <FluentButton aria-label="Edit item" IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(async () => await ProcessPersonModelAsync(true, context))" />
+                    <FluentButton aria-label="Delete item" IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(async () => await DeletePerson(context))" />
+                </TemplateColumn>
+            </FluentDataGrid>
+        </div>
+    </div>
+    <button class="fab" @onclick="async () => await ProcessPersonModelAsync(false)">
+        <FluentIcon Value="@(new Icons.Regular.Size32.AddCircle())" Color="Color.FillInverse" />
+    </button>
+</div>
+
+@code {
+    private IQueryable<PersonModelEf> people = new List<PersonModelEf>().AsQueryable();
+    PersonEditorDialog.RegisterContent DialogData { get; set; } = new PersonEditorDialog.RegisterContent();
+
+    private async Task ProcessPersonModelAsync(bool editmode = false, PersonModelEf? person = null)
+    {
+        var data = DialogData = new();
+        if (!editmode)
+        {
+            // Create a new instance of DialogData
+            // to allow the user to cancel the update
+            data = DialogData with { Id = Guid.Empty } ?? new();
+        }
+        else if(editmode && person is not null)
+        {
+            data = DialogData with { Id = person.Id, Name = person.Name, Age = person.Age, IsHuman = person.IsHuman } ?? new();
+        }
+
+
+        var dialog = await DialogService.ShowDialogAsync<PersonEditorDialog>(data, new DialogParameters()
+        {
+                Height = "400px",
+                Title = $"Updating the {DialogData.Name} database entry",
+                PreventDismissOnOverlayClick = true,
+                PreventScroll = true,
+        });
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            DialogData = (PersonEditorDialog.RegisterContent)result.Data;
+            await CreatePerson();
+        }
+    }
+    private async Task RequestAuthToken()
+    {
+        var requestToken = await _tokenProvider.RequestAccessToken();
+        requestToken.TryGetToken(out var token);
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Value);
+    }
+    private async Task DeletePerson(PersonModelEf person)
+    {
+        await RequestAuthToken();
+        var result = await Http.DeleteAsync($"/api/v1/person/{person.Id}?useEF=true");
+        if (result.IsSuccessStatusCode)
+        {
+            people = people.Where(p => p.Id != person.Id);
+            ToastService.ShowSuccess("Person Deleted!");
+        }
+        else
+        {
+            ToastService.ShowError($"Error deleting person, the server returned: {result.StatusCode} {result.ReasonPhrase}");
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await RequestAuthToken();
+            var thetpeople = await Http.GetFromJsonAsync<List<PersonModelEf>>("/api/v1/person?useEF=true");
+            if (thetpeople != null)
+                people = thetpeople.AsQueryable();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }catch(Exception ex)
+        {
+            ToastService.ShowError($"Error Getting people: {ex.Message}");
+        }
+    }
+    private async Task CreatePerson()
+    {
+        await RequestAuthToken();
+        var person = new PersonModelEf
+        {
+            Id = DialogData.Id,
+            Name = DialogData.Name,
+            Age = DialogData.Age,
+            IsHuman = DialogData.IsHuman
+        };
+        if (DialogData.Id == Guid.Empty)
+        {
+            var result = await Http.PostAsJsonAsync("/api/v1/person?useEF=true", person);
+            if (result.IsSuccessStatusCode)
+            {
+                var p2 = await result.Content.ReadFromJsonAsync<PersonModelEf>();
+                if (p2 is not null)
+                {
+                    DialogData.Age = p2.Age;
+                    DialogData.IsHuman = p2.IsHuman;
+                    DialogData.Name = p2.Name;
+                    DialogData.Id = p2.Id;
+                    people = people.Append(p2).AsQueryable();
+                    ToastService.ShowSuccess("Person Created!");
+                }
+                else
+                {
+                    ToastService.ShowWarning("Unable to confirm creation!");
+                }
+            }
+            else
+            {
+                ToastService.ShowError($"Error creating person, the server returned: {result.StatusCode} {result.ReasonPhrase}");
+            }
+        }
+        else
+        {
+            var result = await Http.PutAsJsonAsync($"/api/v1/person/{person.Id}?useEF=true", person);
+            if (result.IsSuccessStatusCode)
+            {
+                var updatedPerson = people.FirstOrDefault(p => p.Id == person.Id);
+                if (updatedPerson is not null)
+                {
+                    updatedPerson.Age = person.Age;
+                    updatedPerson.IsHuman = person.IsHuman;
+                    updatedPerson.Name = person.Name;
+                }
+                ToastService.ShowSuccess("Person Updated!");
+            }
+            else
+            {
+                ToastService.ShowError($"Error updating person, the server returned: {result.StatusCode} {result.ReasonPhrase}");
+            }
+        }
+
+    }
+}

@@ -3,7 +3,7 @@
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
 
-using Mongotest.Models.V1;
+using Shared.Models;
 
 using System.Numerics;
 using System.Text.Json;
@@ -12,7 +12,7 @@ namespace Mongotest.Data
 {
     public class ApplicationEFContext : DbContext
     {
-        public DbSet<PersonModel> People { get; set; }
+        public DbSet<PersonModelEf> People { get; set; }
         public DbSet<HistoryModelEF> Histories { get; set; }
         public DbSet<HistoryItem> HistoryItems { get; set; }
         public static ApplicationEFContext Create(IMongoDatabase database) =>

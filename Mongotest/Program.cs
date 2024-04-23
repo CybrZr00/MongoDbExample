@@ -37,6 +37,7 @@ builder.Services.Configure<RouteOptions>(options =>
     options.LowercaseUrls = true;
     options.AppendTrailingSlash = false;
 });
+builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 
 builder.Host.UseSerilog((context, configuration) =>
@@ -65,16 +66,16 @@ builder.Services.AddOpenIddict()
     {
         // Note: the validation handler uses OpenID Connect discovery
         // to retrieve the address of the introspection endpoint.
-        options.SetIssuer("https://localhost:5001");
-        options.AddAudiences("rs_demoApi");
+        options.SetIssuer("https://localhost:7071");
+        options.AddAudiences("resource_server_mongo");
 
         // Configure the validation handler to use introspection and register the client
         // credentials used when communicating with the remote introspection endpoint.
         // Use environment variable to store the secret
-        var secret = Environment.GetEnvironmentVariable("DEMO_API") ?? "thisisaverysecretstring";
+        var secret = "1468AA3F-CCA8-4D11-9681-D0EF57B3F4AF";
         if (secret != null)
             options.UseIntrospection()
-                   .SetClientId("rs_demoApi")
+                   .SetClientId("resource_server_mongo")
                    .SetClientSecret(secret);
 
         // Register the System.Net.Http integration.
@@ -124,7 +125,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddScoped<IApplicationDA, ApplicationDA>();
 var app = builder.Build();
-
+app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:7197"));
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

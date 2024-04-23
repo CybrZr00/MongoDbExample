@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using MongoDB.Driver;
 
 using Mongotest.Data;
-using Mongotest.Models.V1;
+using Shared.Models ;
+
+using OpenIddict.Validation.AspNetCore;
 
 using System.Collections;
 
@@ -12,8 +15,8 @@ using System.Collections;
 
 namespace Mongotest.Controllers.V1
 {
-
-    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class HistoryController : ControllerBase
     {
@@ -36,7 +39,7 @@ namespace Mongotest.Controllers.V1
                 var histories = await _context.Histories.ToArrayAsync();
                 foreach (var history in histories)
                 {
-                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId.ToString() == history.Id).ToListAsync();
+                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId == history.Id).ToListAsync();
                 }
                 return Ok(histories);
             }else
@@ -59,7 +62,7 @@ namespace Mongotest.Controllers.V1
                     {
                         return NotFound();
                     }
-                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId.ToString() == history.Id).ToListAsync();
+                    history.HistoryEntries = await _context.HistoryItems.Where(x => x.HistoryModelEFId == history.Id).ToListAsync();
                     return Ok(history);
                 }
                 else

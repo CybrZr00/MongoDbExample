@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/AuthServer/openiddict-server.sqlite3-wal
+/AuthServer/openiddict-server.sqlite3-shm
+/AuthServer/openiddict-server.sqlite3

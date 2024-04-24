@@ -1,7 +1,96 @@
 ﻿@page "/history"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Net.Http.Headers
+@inject IToastService ToastService
+@attribute [Authorize]
 
+@inject IDialogService DialogService
+@inject HttpClient Http
+@using System.Text.Json
+@inject IAccessTokenProvider _tokenProvider;
 <h3>History</h3>
+    <FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
+    @foreach (var history in histories)
+    {
+        string name = GetName(history);
+        <FluentTreeItem Text="@($"Person: {name}")" />
+        <FluentTreeItem Text="@($"Created: {history.DateCreated.ToString()}")" />
+        <FluentTreeItem Text="@($"Last Update: {history.DateLastUpdated.ToString()}")" />
+        <FluentTreeItem Text="@($"ID: {history.ModelId.ToString()}")">
+            <FluentTreeItem Text="Actions">
+                <FluentTreeItem>
+                    <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"></FluentDivider>
+                </FluentTreeItem>
+                @foreach (var action in @history.HistoryEntries)
+                {
+                    try
+                    {
+                        var model = JsonSerializer.Deserialize<PersonModelEf>(action.ModelJson);                        
+                        <FluentTreeItem Text="@($"Action: {action.Action.ToString()}")" />
+                        <FluentTreeItem Text="@($"Instance Created: {model?.DateCreated.ToString()}")" />
+                        <FluentTreeItem Text="@($"Instance Name: {model?.Name}")" />
+                        <FluentTreeItem Text="@($"Instance Age: {model?.Age.ToString()}")" />
+                        <FluentTreeItem Text="@(model?.IsHuman == true ? "Human" : "Non-human")" /> 
+                        <FluentTreeItem>                            
+                            <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"></FluentDivider>
+                        </FluentTreeItem>
+                    }
+                    catch (Exception ex)
+                    {
+                    
+                        throw;
+                    }
+
+                }
+            </FluentTreeItem>
+        </FluentTreeItem>
+        })
+    </FluentTreeView>
 
 @code {
-
+    private IQueryable<HistoryModelEF> histories = new List<HistoryModelEF>().AsQueryable();
+    FluentTreeItem? currentSelected;
+    FluentTreeItem? currentAffected;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await RequestAuthToken();
+            var thehistory = await Http.GetFromJsonAsync<List<HistoryModelEF>>("/api/v1/history?useEF=true");
+            if (thehistory != null)
+                histories = thehistory.AsQueryable();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error Getting people: {ex.Message}");
+        }
+    }
+    private string GetName(HistoryModelEF model)
+    {
+        var y = model?.HistoryEntries?.FirstOrDefault();
+        if (y == null)
+            return "";
+        var json = y.ModelJson;
+        if (!string.IsNullOrEmpty(json))
+        {
+            var person = JsonSerializer.Deserialize<PersonModelEf>(json);
+            return person?.Name ?? "";
+        }
+        return "";
+    }
+    private async Task RequestAuthToken()
+    {
+        var requestToken = await _tokenProvider.RequestAccessToken();
+        requestToken.TryGetToken(out var token);
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Value);
+    }
+    private void HandleOnExpandedChanged(FluentTreeItem item)
+    {
+        currentAffected = item;
+    }
 }

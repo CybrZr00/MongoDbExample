@@ -68,8 +68,6 @@ namespace AuthServer.ServiceExtensions
                                       .SetUserinfoEndpointUris("/" + ServerRoutes.UserInfo.Get)
                                       .SetVerificationEndpointUris("/" + ServerRoutes.Authorisation.Verify);
 
-                            // Note: this sample uses the code, device code, password and refresh token flows, but you
-                            // can enable the other flows if you need to support implicit or client credentials.
                             options
                             .AllowAuthorizationCodeFlow()
                             .RequireProofKeyForCodeExchange()
